@@ -1,26 +1,269 @@
 @import "tailwindcss";
 
+/* =========================================================
+   DESIGN TOKENS
+   ========================================================= */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-inter: "Inter", sans-serif;
+
+  /* Background layers */
+  --bg-base:       #060b18;
+  --bg-surface:    #0d1526;
+  --bg-card:       rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.07);
+
+  /* Borders */
+  --border:        rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  /* Text */
+  --text-primary:  #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted:    #475569;
+
+  /* Accent — Emerald */
+  --emerald-400:  #34d399;
+  --emerald-500:  #10b981;
+  --emerald-glow: rgba(16, 185, 129, 0.25);
+
+  /* Accent — Amber */
+  --amber-400:    #fbbf24;
+  --amber-500:    #f59e0b;
+  --amber-glow:   rgba(245, 158, 11, 0.25);
+
+  /* Accent — Red */
+  --red-400:      #f87171;
+  --red-500:      #ef4444;
+  --red-glow:     rgba(239, 68, 68, 0.25);
+
+  /* Accent — Blue */
+  --blue-400:     #60a5fa;
+  --blue-500:     #3b82f6;
+  --blue-glow:    rgba(59, 130, 246, 0.20);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* =========================================================
+   BASE RESET
+   ========================================================= */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow-emerald {
+  0%, 100% { box-shadow: 0 0 0 0 var(--emerald-glow); }
+  50%       { box-shadow: 0 0 20px 4px var(--emerald-glow); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease both;
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
+}
+
+/* Staggered animation delays for lists */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.20s; }
+.stagger-5 { animation-delay: 0.25s; }
+
+/* =========================================================
+   GLASS CARD
+   ========================================================= */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.glass-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
+}
+
+/* =========================================================
+   VERDICT BADGES
+   ========================================================= */
+.verdict-invest {
+  background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.08));
+  border: 1px solid var(--emerald-500);
+  color: var(--emerald-400);
+  box-shadow: 0 0 30px var(--emerald-glow);
+}
+
+.verdict-watchlist {
+  background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.08));
+  border: 1px solid var(--amber-500);
+  color: var(--amber-400);
+  box-shadow: 0 0 30px var(--amber-glow);
+}
+
+.verdict-pass {
+  background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.08));
+  border: 1px solid var(--red-500);
+  color: var(--red-400);
+  box-shadow: 0 0 30px var(--red-glow);
+}
+
+/* =========================================================
+   SCORE BAR
+   ========================================================= */
+.score-bar-track {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--emerald-500), var(--emerald-400));
+  transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================================
+   PROGRESS FEED
+   ========================================================= */
+.node-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.node-chip-done {
+  border-color: var(--emerald-500);
+  color: var(--emerald-400);
+  background: rgba(16,185,129,0.08);
+}
+
+/* =========================================================
+   SHIMMER SKELETON
+   ========================================================= */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%
+  );
+  background-size: 200% auto;
+  animation: shimmer 1.8s linear infinite;
+  border-radius: 8px;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+/* =========================================================
+   PRINT / PDF EXPORT
+   ========================================================= */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12pt;
+  }
+
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+
+  .glass-card {
+    background: #f8f8f8 !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    margin-bottom: 16pt;
+  }
+
+  .verdict-invest, .verdict-watchlist, .verdict-pass {
+    box-shadow: none !important;
+  }
+
+  .score-bar-fill {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  h1, h2, h3 { color: #000 !important; }
+  p, li, span { color: #333 !important; }
+
+  a { color: #1a0dab !important; text-decoration: underline !important; }
+
+  /* Force color on verdict badges for print */
+  .verdict-invest  { background: #d1fae5 !important; color: #065f46 !important; }
+  .verdict-watchlist { background: #fef3c7 !important; color: #92400e !important; }
+  .verdict-pass    { background: #fee2e2 !important; color: #991b1b !important; }
+}
+
+.print-only { display: none; }
