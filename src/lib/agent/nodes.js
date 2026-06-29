@@ -172,6 +172,7 @@ export async function bullCaseNode(state) {
 
 export async function bearCaseNode(state) {
   try {
+    await new Promise(r => setTimeout(r, 3000)); // stagger to avoid TPM collision
     const response = await llm.invoke(bearCasePrompt(state));
     const result = await parseJsonResponse(response);
     return {
@@ -206,6 +207,7 @@ export async function moatNode(state) {
 
 export async function catalystsNode(state) {
   try {
+    await new Promise(r => setTimeout(r, 3000)); // stagger to avoid TPM collision
     const response = await llm.invoke(catalystsPrompt(state));
     const result = await parseJsonResponse(response);
     return {

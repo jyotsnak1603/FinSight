@@ -89,8 +89,10 @@ Score the company on:
 
 Choose ONLY ONE verdict: INVEST, WATCHLIST, or PASS.
 - INVEST = strong upside with acceptable risk
-- WATCHLIST = promising but needs monitoring
+- WATCHLIST = promising but needs monitoring  
 - PASS = risk too high or weak investment case
+
+For confidence: Use a number between 55 and 95. NEVER use 0. Base it on data quality and strength of evidence.
 
 Return ONLY valid JSON:
 
