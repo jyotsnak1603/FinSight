@@ -54,8 +54,6 @@ To guarantee 100% uptime, the `gemini.js` orchestrator utilizes a custom fallbac
 
 Here is an example of a complete, institutional-grade report generated for **NVIDIA (NVDA)**. The autonomous agent successfully evaluated the company's financial health, generated contrasting bull/bear arguments, and conducted a Devil's Advocate review.
 
-*(Note: Save the screenshots you took into the `public/` folder as `nvda-1.png`, `nvda-2.png`, and `nvda-3.png` so they render correctly on GitHub).*
-
 ![NVDA Verdict and Dimension Scores](./public/nvda-1.png)
 
 ![NVDA Bull and Bear Case](./public/nvda-2.png)
