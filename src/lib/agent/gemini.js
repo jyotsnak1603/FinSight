@@ -41,7 +41,7 @@ export const llm = {
           
           const ultimateLlm = new ChatGroq({
             apiKey: process.env.GROQ_API_KEY,
-            model: "llama-3.3-70b-versatile",
+            model: "llama-3.1-8b-instant", // 20,000 TPM — 3x more headroom than 70B (6K TPM)
             temperature: 0.2,
             maxRetries: 2,
           });
