@@ -13,14 +13,14 @@ const client = tavily({
 
 export async function searchWeb(query) {
   const result = await client.search(query, {
-    maxResults: 3,
+    maxResults: 2,
   });
 
-  // Truncate content per result to keep token usage low
+  // Keep content tight to stay within Groq's 20K TPM limit
   return result.results.map(r => ({
     url: r.url,
     title: r.title,
-    content: (r.content || "").slice(0, 400),
+    content: (r.content || "").slice(0, 200),
   }));
 }
 
