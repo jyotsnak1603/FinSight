@@ -51,7 +51,16 @@ To guarantee 100% uptime, the `gemini.js` orchestrator utilizes a custom fallbac
 3. **Alpha Vantage vs. Web Scraping:** Financial numbers scraped from web articles are often hallucinated or outdated. I traded slightly higher API complexity to strictly fetch JSON metrics via Alpha Vantage, guaranteeing that P/E ratios and Market Caps are mathematically accurate.
 
 ## Example Runs
-*(Attach screenshots or text of the Apple, Tesla, or Nvidia reports here).*
+
+Here is an example of a complete, institutional-grade report generated for **NVIDIA (NVDA)**. The autonomous agent successfully evaluated the company's financial health, generated contrasting bull/bear arguments, and conducted a Devil's Advocate review.
+
+*(Note: Save the screenshots you took into the `public/` folder as `nvda-1.png`, `nvda-2.png`, and `nvda-3.png` so they render correctly on GitHub).*
+
+![NVDA Verdict and Dimension Scores](./public/nvda-1.png)
+
+![NVDA Bull and Bear Case](./public/nvda-2.png)
+
+![NVDA Committee Review and Sources](./public/nvda-3.png)
 
 ## What I would improve with more time
 - **Database Persistence:** I would add a PostgreSQL database (via Prisma) to cache finalized reports, saving API costs and providing users with a historical dashboard of their research.
