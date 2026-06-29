@@ -118,7 +118,7 @@ export default function Home() {
             width: "800px",
             height: "500px",
             background:
-              "radial-gradient(ellipse at center, rgba(16,185,129,0.07) 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, color-mix(in srgb, var(--emerald-500) 15%, transparent) 0%, transparent 70%)",
             borderRadius: "50%",
           }}
         />
@@ -130,7 +130,7 @@ export default function Home() {
             width: "600px",
             height: "400px",
             background:
-              "radial-gradient(ellipse at center, rgba(59,130,246,0.05) 0%, transparent 70%)",
+              "radial-gradient(ellipse at center, color-mix(in srgb, var(--blue-500) 15%, transparent) 0%, transparent 70%)",
             borderRadius: "50%",
           }}
         />
@@ -291,9 +291,7 @@ export default function Home() {
                   lineHeight: "1.6",
                 }}
               >
-                Powered by Gemini 2.5 Flash and live web search. Get a full
-                investment verdict with bull/bear analysis, moat scoring, and a
-                devil's advocate committee review.
+                Let our AI do the heavy lifting. Get clear, unbiased research on any stock, including pros, cons, and a final verdict to help you invest with confidence.
               </p>
             </>
           )}
@@ -302,6 +300,39 @@ export default function Home() {
             onSearch={runResearch}
             isLoading={status === "loading"}
           />
+
+          {status === "idle" && (
+            <div className="animate-fade-in-up stagger-3" style={{ marginTop: "48px", width: "100%", maxWidth: "600px", textAlign: "left", margin: "48px auto 0" }}>
+              <div style={{ fontSize: "14px", fontWeight: "600", color: "var(--text-muted)", marginBottom: "16px", paddingLeft: "4px" }}>
+                Trending Analysis
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "16px" }}>
+                {[
+                  { symbol: "NVDA", name: "NVIDIA Corp" },
+                  { symbol: "AAPL", name: "Apple Inc." },
+                  { symbol: "MSFT", name: "Microsoft Corp" }
+                ].map(asset => (
+                  <button
+                    key={asset.symbol}
+                    onClick={() => runResearch(asset.symbol)}
+                    className="glass-card"
+                    style={{
+                      padding: "16px",
+                      textAlign: "left",
+                      cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "4px",
+                      border: "1px solid var(--border)",
+                    }}
+                  >
+                    <span style={{ fontSize: "16px", fontWeight: "700", color: "var(--text-primary)" }}>{asset.symbol}</span>
+                    <span style={{ fontSize: "12px", color: "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{asset.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Error state */}

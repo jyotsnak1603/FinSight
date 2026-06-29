@@ -2,31 +2,28 @@
 
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Sphere, Points, PointMaterial } from "@react-three/drei";
+import { Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { useTheme } from "next-themes";
 
-function NeuralGlobe() {
+function FullScreenNetwork() {
   const group = useRef();
-  const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
   
-  // Decide colors based on theme
-  const isDark = theme === "dark" || !theme;
-  const sphereColor = isDark ? "#0d1526" : "#f8fafc";
-  const lineColor = isDark ? "#10b981" : "#059669"; // Emerald
-  const nodeColor = isDark ? "#3b82f6" : "#2563eb"; // Blue
+  const isDark = resolvedTheme === "dark" || (!resolvedTheme && theme !== "light");
+  const fogColor = isDark ? "#060b18" : "#f4f6fa";
+  const lineColor = isDark ? "#10b981" : "#94a3b8"; // Emerald or muted slate
+  const nodeColor = isDark ? "#3b82f6" : "#64748b"; // Blue or muted blue
 
-  // Generate random points for the network
-  const particlesCount = 150;
+  // Generate random points in a wide area
+  const particlesCount = 450;
   const positions = useMemo(() => {
     const pos = new Float32Array(particlesCount * 3);
     for (let i = 0; i < particlesCount; i++) {
-      const phi = Math.acos(-1 + (2 * i) / particlesCount);
-      const theta = Math.sqrt(particlesCount * Math.PI) * phi;
-      const r = 2.5; // Radius
-      pos[i * 3] = r * Math.cos(theta) * Math.sin(phi);
-      pos[i * 3 + 1] = r * Math.sin(theta) * Math.sin(phi);
-      pos[i * 3 + 2] = r * Math.cos(phi);
+      // spread them widely across x and y, but keep z somewhat tight so they stay in view
+      pos[i * 3] = (Math.random() - 0.5) * 22;     // x
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 14; // y
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 12; // z
     }
     return pos;
   }, [particlesCount]);
@@ -38,7 +35,7 @@ function NeuralGlobe() {
       for (let j = i + 1; j < particlesCount; j++) {
         const p1 = new THREE.Vector3(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
         const p2 = new THREE.Vector3(positions[j * 3], positions[j * 3 + 1], positions[j * 3 + 2]);
-        if (p1.distanceTo(p2) < 1.2) {
+        if (p1.distanceTo(p2) < 2.0) {
           linePoints.push(p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
         }
       }
@@ -47,45 +44,41 @@ function NeuralGlobe() {
   }, [positions, particlesCount]);
 
   useFrame((state, delta) => {
-    group.current.rotation.y += delta * 0.1;
-    group.current.rotation.x += delta * 0.05;
+    // slow rotation
+    group.current.rotation.y += delta * 0.05;
+    group.current.rotation.x += delta * 0.02;
+    // gentle floating
+    group.current.position.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.5;
   });
 
   return (
-    <group ref={group}>
-      {/* Central Globe */}
-      <Sphere args={[2.4, 32, 32]}>
-        <meshStandardMaterial color={sphereColor} transparent opacity={0.6} wireframe={isDark} />
-      </Sphere>
-
-      {/* Nodes */}
-      <Points positions={positions}>
-        <PointMaterial transparent color={nodeColor} size={0.08} sizeAttenuation={true} depthWrite={false} />
-      </Points>
-
-      {/* Connections */}
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={lines.length / 3}
-            array={lines}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color={lineColor} transparent opacity={0.2} />
-      </lineSegments>
-    </group>
+    <>
+      <fog attach="fog" args={[fogColor, 5, 16]} />
+      <group ref={group}>
+        <Points positions={positions}>
+          <PointMaterial transparent color={nodeColor} size={0.06} sizeAttenuation={true} depthWrite={false} />
+        </Points>
+        <lineSegments>
+          <bufferGeometry>
+            <bufferAttribute
+              attach="attributes-position"
+              count={lines.length / 3}
+              array={lines}
+              itemSize={3}
+            />
+          </bufferGeometry>
+          <lineBasicMaterial color={lineColor} transparent opacity={isDark ? 0.25 : 0.3} />
+        </lineSegments>
+      </group>
+    </>
   );
 }
 
 export default function Hero3D() {
   return (
     <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 0, pointerEvents: "none" }}>
-      <Canvas camera={{ position: [0, 0, 7], fov: 45 }}>
-        <ambientLight intensity={1} />
-        <directionalLight position={[10, 10, 5]} intensity={2} />
-        <NeuralGlobe />
+      <Canvas camera={{ position: [0, 0, 7], fov: 60 }}>
+        <FullScreenNetwork />
       </Canvas>
     </div>
   );

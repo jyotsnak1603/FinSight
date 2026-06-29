@@ -162,8 +162,7 @@ export default function LandingPage() {
             lineHeight: "1.6",
           }}
         >
-          Powered by Gemini 2.5 Flash and a swarm of AI agents. 
-          Discover alpha, analyze moats, and get institutional-grade verdicts in seconds.
+          Your personal AI financial analyst. Instantly research any company, understand its strengths and weaknesses, and make smarter investment decisions in seconds.
         </p>
 
         <Link
