@@ -66,7 +66,7 @@ export default function LandingPage() {
               letterSpacing: "-0.02em",
             }}
           >
-            AlphaForge{" "}
+            FinSight{" "}
             <span style={{ color: "var(--emerald-500)" }}>AI</span>
           </span>
         </div>

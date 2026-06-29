@@ -2,7 +2,7 @@ import { tavily } from "@tavily/core";
 
 if (!process.env.TAVILY_API_KEY) {
   throw new Error(
-    "[AlphaForge] TAVILY_API_KEY environment variable is not set. " +
+    "[FinSight] TAVILY_API_KEY environment variable is not set. " +
     "Add it to your .env.local file."
   );
 }

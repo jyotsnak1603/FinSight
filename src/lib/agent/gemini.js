@@ -2,7 +2,7 @@ import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 
 if (!process.env.GOOGLE_API_KEY) {
   throw new Error(
-    "[AlphaForge] GOOGLE_API_KEY environment variable is not set. " +
+    "[FinSight] GOOGLE_API_KEY environment variable is not set. " +
     "Add it to your .env.local file."
   );
 }

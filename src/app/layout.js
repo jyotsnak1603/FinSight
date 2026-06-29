@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "AlphaForge AI — Investment Research Platform",
+  title: "FinSight AI — Investment Research Platform",
   description:
     "AI-powered investment research. Get a comprehensive investment verdict on any public company in seconds.",
 };

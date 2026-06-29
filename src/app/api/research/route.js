@@ -179,7 +179,7 @@ export async function POST(req) {
         controller.close();
       } catch (error) {
         // Log full error server-side, send generic message to client
-        console.error("[AlphaForge] Research pipeline error:", error);
+        console.error("[FinSight] Research pipeline error:", error);
         emit({
           event: "error",
           message: "Research pipeline failed. Please try again.",
