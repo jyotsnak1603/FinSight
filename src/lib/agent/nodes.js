@@ -1,5 +1,6 @@
 import { searchWeb, getFinancialMetrics } from "./tools";
 import { llm } from "./gemini";
+import { ChatGroq } from "@langchain/groq";
 import {
   summarizePrompt,
   synthesisPrompt,
@@ -172,7 +173,6 @@ export async function bullCaseNode(state) {
 
 export async function bearCaseNode(state) {
   try {
-    await new Promise(r => setTimeout(r, 3000)); // stagger to avoid TPM collision
     const response = await llm.invoke(bearCasePrompt(state));
     const result = await parseJsonResponse(response);
     return {
@@ -207,7 +207,6 @@ export async function moatNode(state) {
 
 export async function catalystsNode(state) {
   try {
-    await new Promise(r => setTimeout(r, 3000)); // stagger to avoid TPM collision
     const response = await llm.invoke(catalystsPrompt(state));
     const result = await parseJsonResponse(response);
     return {
@@ -223,9 +222,14 @@ export async function catalystsNode(state) {
   }
 }
 
+// Dedicated fast LLM for critical JSON nodes (synthesis + committee)
+const criticalLlm = process.env.GROQ_API_KEY
+  ? new ChatGroq({ apiKey: process.env.GROQ_API_KEY, model: "llama-3.3-70b-versatile", temperature: 0.1, maxRetries: 2 })
+  : llm;
+
 export async function synthesisNode(state) {
   try {
-    const response = await llm.invoke(synthesisPrompt(state));
+    const response = await criticalLlm.invoke(synthesisPrompt(state));
     const result = await parseJsonResponse(response);
 
     const allSources = [
@@ -263,7 +267,7 @@ export async function synthesisNode(state) {
 
 export async function committeeNode(state) {
   try {
-    const response = await llm.invoke(committeePrompt(state));
+    const response = await criticalLlm.invoke(committeePrompt(state));
     const result = await parseJsonResponse(response);
     return {
       committeeDecision: result,
