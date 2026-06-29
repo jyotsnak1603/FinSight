@@ -11,6 +11,7 @@ ${JSON.stringify(searchResults)}
 
 Provide a concise, evidence-based analysis in 2-3 paragraphs.
 Mention important facts, risks, and signals. Avoid hype.
+If the Search Results are empty or irrelevant, simply state that no meaningful data could be found for this company in this category.
 `;
 
 export const bullCasePrompt = (state) => `
@@ -128,7 +129,7 @@ Do not use HOLD, BUY, SELL, AVOID, or any other word.
 Guidance:
 - INVEST = strong upside with acceptable risk
 - WATCHLIST = promising but risks/valuation/execution need monitoring
-- PASS = risk is too high or investment case is weak
+- PASS = risk is too high or investment case is weak. **If there is a severe lack of information or the company appears to be unknown, you MUST select PASS and set confidence to 0.**
 
 Return ONLY valid JSON:
 

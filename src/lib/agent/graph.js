@@ -68,30 +68,19 @@ const workflow = new StateGraph(AgentState)
   .addNode("synthesis_node", synthesisNode)
   .addNode("committee_node", committeeNode)
 
-  // --- Fan-out: run all 5 research nodes in parallel from START ---
+  // --- Sequential Research (To avoid massive Token/Minute Rate Limits) ---
   .addEdge(START, "business_node")
-  .addEdge(START, "financials_node")
-  .addEdge(START, "competition_node")
-  .addEdge(START, "team_news_node")
-  .addEdge(START, "risks_node")
-
-  // --- Fan-in: all 5 converge on gather_research (LangGraph waits for all) ---
-  .addEdge("business_node", "gather_research")
-  .addEdge("financials_node", "gather_research")
-  .addEdge("competition_node", "gather_research")
-  .addEdge("team_news_node", "gather_research")
+  .addEdge("business_node", "financials_node")
+  .addEdge("financials_node", "competition_node")
+  .addEdge("competition_node", "team_news_node")
+  .addEdge("team_news_node", "risks_node")
   .addEdge("risks_node", "gather_research")
 
-  // --- Fan-out: run moat, catalysts, bull, bear in parallel ---
+  // --- Sequential Analysis ---
   .addEdge("gather_research", "moat_node")
-  .addEdge("gather_research", "catalysts_node")
-  .addEdge("gather_research", "bull_case_node")
-  .addEdge("gather_research", "bear_case_node")
-
-  // --- Fan-in: all 4 converge on synthesis ---
-  .addEdge("moat_node", "synthesis_node")
-  .addEdge("catalysts_node", "synthesis_node")
-  .addEdge("bull_case_node", "synthesis_node")
+  .addEdge("moat_node", "catalysts_node")
+  .addEdge("catalysts_node", "bull_case_node")
+  .addEdge("bull_case_node", "bear_case_node")
   .addEdge("bear_case_node", "synthesis_node")
 
   // --- Sequential tail ---

@@ -1,5 +1,6 @@
-import { searchWeb } from "./tools";
+import { searchWeb, getFinancialMetrics } from "./tools";
 import { llm } from "./gemini";
+import { ChatGroq } from "@langchain/groq";
 import {
   summarizePrompt,
   synthesisPrompt,
@@ -74,15 +75,47 @@ export async function businessModelNode(state) {
 }
 
 export async function financialsNode(state) {
-  const result = await runResearch(
-    state.company,
-    "Financial Health",
-    `${state.company} revenue growth profitability valuation latest annual results`
-  );
-  return {
-    financials: result,
-    steps: ["Financial Analysis Completed"],
-  };
+  try {
+    const metrics = await getFinancialMetrics(state.company);
+    let searchResults = [];
+    
+    if (metrics) {
+      searchResults = await searchWeb(`${state.company} revenue growth profitability valuation latest annual results`);
+      
+      const enhancedSources = [
+        { url: "Alpha Vantage API", content: `Official Financial Metrics: ${JSON.stringify(metrics)}` },
+        ...searchResults
+      ];
+
+      const response = await llm.invoke(
+        summarizePrompt(state.company, "Financial Health", enhancedSources)
+      );
+
+      return {
+        financials: {
+          summary: response.content,
+          sources: searchResults,
+        },
+        steps: ["Financial Analysis Completed (with Alpha Vantage)"],
+      };
+    } else {
+      const result = await runResearch(
+        state.company,
+        "Financial Health",
+        `${state.company} revenue growth profitability valuation latest annual results`
+      );
+      return {
+        financials: result,
+        steps: ["Financial Analysis Completed"],
+      };
+    }
+  } catch (error) {
+    console.error("Financials node failed:", error.message);
+    return {
+      financials: { summary: "Failed to gather financial data", sources: [] },
+      steps: ["Financial Analysis Failed"],
+    };
+  }
 }
 
 export async function competitionNode(state) {
@@ -98,15 +131,39 @@ export async function competitionNode(state) {
 }
 
 export async function teamNewsNode(state) {
-  const result = await runResearch(
-    state.company,
-    "Leadership and News",
-    `${state.company} CEO founder leadership recent news`
-  );
-  return {
-    teamAndNews: result,
-    steps: ["Leadership and News Completed"],
-  };
+  try {
+    const searchResults = await searchWeb(`${state.company} CEO founder leadership recent news`);
+    
+    let analysisLlm = llm;
+    if (process.env.GROQ_API_KEY) {
+      analysisLlm = new ChatGroq({
+        apiKey: process.env.GROQ_API_KEY,
+        model: "llama-3.1-8b-instant",
+        maxRetries: 1,
+      });
+    }
+
+    const response = await analysisLlm.invoke(
+      summarizePrompt(state.company, "Leadership and News", searchResults)
+    );
+    
+    return {
+      teamAndNews: {
+        summary: response.content,
+        sources: searchResults,
+      },
+      steps: ["Leadership and News Completed (via Groq Llama-3)"],
+    };
+  } catch (error) {
+    console.error(`Research failed for Leadership and News:`, error.message);
+    return {
+      teamAndNews: {
+        summary: `Research data for Leadership and News was unavailable at this time.`,
+        sources: [],
+      },
+      steps: ["Leadership and News Failed"],
+    };
+  }
 }
 
 export async function riskFactorsNode(state) {
