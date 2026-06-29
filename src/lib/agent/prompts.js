@@ -1,5 +1,6 @@
-export const summarizePrompt = (company, category, searchResults) => `
-You are an expert investment researcher.
+const trim = (text, max = 800) => (text || "No data available.").slice(0, max);
+
+export const summarizePrompt = (company, category, searchResults) => `You are an expert investment researcher.
 
 Company: ${company}
 
@@ -19,20 +20,11 @@ You are an investment analyst building the bull case for ${state.company}.
 
 Use the research below:
 
-BUSINESS MODEL:
-${state.businessModel?.summary}
-
-FINANCIAL HEALTH:
-${state.financials?.summary}
-
-COMPETITION:
-${state.competition?.summary}
-
-LEADERSHIP & NEWS:
-${state.teamAndNews?.summary}
-
-RISKS:
-${state.riskFactors?.summary}
+BUSINESS MODEL: ${trim(state.businessModel?.summary)}
+FINANCIAL HEALTH: ${trim(state.financials?.summary)}
+COMPETITION: ${trim(state.competition?.summary)}
+LEADERSHIP & NEWS: ${trim(state.teamAndNews?.summary)}
+RISKS: ${trim(state.riskFactors?.summary)}
 
 Return ONLY valid JSON:
 
@@ -54,20 +46,11 @@ You are an investment analyst building the bear case for ${state.company}.
 
 Use the research below:
 
-BUSINESS MODEL:
-${state.businessModel?.summary}
-
-FINANCIAL HEALTH:
-${state.financials?.summary}
-
-COMPETITION:
-${state.competition?.summary}
-
-LEADERSHIP & NEWS:
-${state.teamAndNews?.summary}
-
-RISKS:
-${state.riskFactors?.summary}
+BUSINESS MODEL: ${trim(state.businessModel?.summary)}
+FINANCIAL HEALTH: ${trim(state.financials?.summary)}
+COMPETITION: ${trim(state.competition?.summary)}
+LEADERSHIP & NEWS: ${trim(state.teamAndNews?.summary)}
+RISKS: ${trim(state.riskFactors?.summary)}
 
 Return ONLY valid JSON:
 
@@ -89,72 +72,35 @@ You are a senior investment analyst.
 
 Analyze the following research about ${state.company}.
 
-BUSINESS MODEL:
-${state.businessModel?.summary}
-
-FINANCIAL HEALTH:
-${state.financials?.summary}
-
-COMPETITION:
-${state.competition?.summary}
-
-LEADERSHIP & NEWS:
-${state.teamAndNews?.summary}
-
-RISKS:
-${state.riskFactors?.summary}
-
-BULL CASE:
-${JSON.stringify(state.bullCase)}
-
-BEAR CASE:
-${JSON.stringify(state.bearCase)}
+BUSINESS MODEL: ${trim(state.businessModel?.summary)}
+FINANCIAL HEALTH: ${trim(state.financials?.summary)}
+COMPETITION: ${trim(state.competition?.summary)}
+LEADERSHIP & NEWS: ${trim(state.teamAndNews?.summary)}
+RISKS: ${trim(state.riskFactors?.summary)}
+BULL CASE: ${trim(JSON.stringify(state.bullCase))}
+BEAR CASE: ${trim(JSON.stringify(state.bearCase))}
 
 Score the company on:
-
 1. Market Opportunity (1-10)
 2. Competitive Moat (1-10)
 3. Financial Health (1-10)
 4. Team & Execution (1-10)
 5. Risk Profile (1-10)
 
-Important verdict rule:
-Choose ONLY ONE of these verdicts:
-- INVEST
-- WATCHLIST
-- PASS
-
-Do not use HOLD, BUY, SELL, AVOID, or any other word.
-
-Guidance:
+Choose ONLY ONE verdict: INVEST, WATCHLIST, or PASS.
 - INVEST = strong upside with acceptable risk
-- WATCHLIST = promising but risks/valuation/execution need monitoring
-- PASS = risk is too high or investment case is weak. **If there is a severe lack of information or the company appears to be unknown, you MUST select PASS and set confidence to 0.**
+- WATCHLIST = promising but needs monitoring
+- PASS = risk too high or weak investment case
 
 Return ONLY valid JSON:
 
 {
   "scores": {
-    "marketOpportunity": {
-      "score": 0,
-      "reason": ""
-    },
-    "competitiveMoat": {
-      "score": 0,
-      "reason": ""
-    },
-    "financialHealth": {
-      "score": 0,
-      "reason": ""
-    },
-    "teamExecution": {
-      "score": 0,
-      "reason": ""
-    },
-    "riskProfile": {
-      "score": 0,
-      "reason": ""
-    }
+    "marketOpportunity": { "score": 0, "reason": "" },
+    "competitiveMoat": { "score": 0, "reason": "" },
+    "financialHealth": { "score": 0, "reason": "" },
+    "teamExecution": { "score": 0, "reason": "" },
+    "riskProfile": { "score": 0, "reason": "" }
   },
   "verdict": "INVEST | WATCHLIST | PASS",
   "confidence": 0,
@@ -167,46 +113,20 @@ You are a venture capital analyst.
 
 Analyze the competitive moat of ${state.company}.
 
-Use the research below:
-
-BUSINESS MODEL:
-${state.businessModel?.summary}
-
-FINANCIAL HEALTH:
-${state.financials?.summary}
-
-COMPETITION:
-${state.competition?.summary}
-
-LEADERSHIP & NEWS:
-${state.teamAndNews?.summary}
-
-RISKS:
-${state.riskFactors?.summary}
+BUSINESS MODEL: ${trim(state.businessModel?.summary)}
+FINANCIAL HEALTH: ${trim(state.financials?.summary)}
+COMPETITION: ${trim(state.competition?.summary)}
+LEADERSHIP & NEWS: ${trim(state.teamAndNews?.summary)}
+RISKS: ${trim(state.riskFactors?.summary)}
 
 Return ONLY valid JSON:
 
 {
-  "brand": {
-    "score": 0,
-    "reason": ""
-  },
-  "technology": {
-    "score": 0,
-    "reason": ""
-  },
-  "networkEffects": {
-    "score": 0,
-    "reason": ""
-  },
-  "switchingCosts": {
-    "score": 0,
-    "reason": ""
-  },
-  "overallMoat": {
-    "score": 0,
-    "reason": ""
-  }
+  "brand": { "score": 0, "reason": "" },
+  "technology": { "score": 0, "reason": "" },
+  "networkEffects": { "score": 0, "reason": "" },
+  "switchingCosts": { "score": 0, "reason": "" },
+  "overallMoat": { "score": 0, "reason": "" }
 }
 `;
 
@@ -215,37 +135,20 @@ You are an investment analyst.
 
 Identify future catalysts for ${state.company}.
 
-Use the research below:
-
-BUSINESS MODEL:
-${state.businessModel?.summary}
-
-FINANCIAL HEALTH:
-${state.financials?.summary}
-
-COMPETITION:
-${state.competition?.summary}
-
-LEADERSHIP & NEWS:
-${state.teamAndNews?.summary}
-
-RISKS:
-${state.riskFactors?.summary}
+BUSINESS MODEL: ${trim(state.businessModel?.summary)}
+FINANCIAL HEALTH: ${trim(state.financials?.summary)}
+COMPETITION: ${trim(state.competition?.summary)}
+LEADERSHIP & NEWS: ${trim(state.teamAndNews?.summary)}
+RISKS: ${trim(state.riskFactors?.summary)}
 
 Return ONLY valid JSON:
 
 {
   "positiveCatalysts": [
-    {
-      "title": "",
-      "impact": ""
-    }
+    { "title": "", "impact": "" }
   ],
   "negativeCatalysts": [
-    {
-      "title": "",
-      "impact": ""
-    }
+    { "title": "", "impact": "" }
   ]
 }
 `;
