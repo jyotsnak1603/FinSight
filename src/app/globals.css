@@ -6,7 +6,44 @@
 :root {
   --font-inter: "Inter", sans-serif;
 
-  /* Background layers */
+  /* Light Theme Variables */
+  --bg-base:       #f8fafc;
+  --bg-surface:    #ffffff;
+  --bg-card:       rgba(0, 0, 0, 0.02);
+  --bg-card-hover: rgba(0, 0, 0, 0.04);
+
+  /* Borders */
+  --border:        rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+
+  /* Text */
+  --text-primary:  #0f172a;
+  --text-secondary: #475569;
+  --text-muted:    #94a3b8;
+
+  /* Accent — Emerald */
+  --emerald-400:  #34d399;
+  --emerald-500:  #10b981;
+  --emerald-glow: rgba(16, 185, 129, 0.15);
+
+  /* Accent — Amber */
+  --amber-400:    #fbbf24;
+  --amber-500:    #f59e0b;
+  --amber-glow:   rgba(245, 158, 11, 0.15);
+
+  /* Accent — Red */
+  --red-400:      #f87171;
+  --red-500:      #ef4444;
+  --red-glow:     rgba(239, 68, 68, 0.15);
+
+  /* Accent — Blue */
+  --blue-400:     #60a5fa;
+  --blue-500:     #3b82f6;
+  --blue-glow:    rgba(59, 130, 246, 0.15);
+}
+
+.dark {
+  /* Dark Theme Variables */
   --bg-base:       #060b18;
   --bg-surface:    #0d1526;
   --bg-card:       rgba(255, 255, 255, 0.04);
@@ -21,24 +58,10 @@
   --text-secondary: #94a3b8;
   --text-muted:    #475569;
 
-  /* Accent — Emerald */
-  --emerald-400:  #34d399;
-  --emerald-500:  #10b981;
+  /* Accent glows */
   --emerald-glow: rgba(16, 185, 129, 0.25);
-
-  /* Accent — Amber */
-  --amber-400:    #fbbf24;
-  --amber-500:    #f59e0b;
   --amber-glow:   rgba(245, 158, 11, 0.25);
-
-  /* Accent — Red */
-  --red-400:      #f87171;
-  --red-500:      #ef4444;
   --red-glow:     rgba(239, 68, 68, 0.25);
-
-  /* Accent — Blue */
-  --blue-400:     #60a5fa;
-  --blue-500:     #3b82f6;
   --blue-glow:    rgba(59, 130, 246, 0.20);
 }
 
@@ -133,6 +156,14 @@ body {
 .glass-card:hover {
   background: var(--bg-card-hover);
   border-color: var(--border-strong);
+}
+
+/* =========================================================
+   BACKGROUNDS & TEXTURES
+   ========================================================= */
+.bg-pattern {
+  background-image: radial-gradient(var(--border-strong) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
 
 /* =========================================================
