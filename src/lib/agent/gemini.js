@@ -8,47 +8,31 @@ if (!process.env.GOOGLE_API_KEY) {
   );
 }
 
-// Primary Model
-const primaryLlm = new ChatGoogleGenerativeAI({
+// All models set maxRetries: 0 — fail fast, never wait on exponential backoff
+const gemini25 = new ChatGoogleGenerativeAI({
   model: "gemini-2.5-flash",
   temperature: 0.2,
   apiKey: process.env.GOOGLE_API_KEY,
   maxRetries: 0,
 });
 
-// First Fallback
-const fallbackLlm = new ChatGoogleGenerativeAI({
+const gemini15 = new ChatGoogleGenerativeAI({
   model: "gemini-1.5-flash",
   temperature: 0.2,
   apiKey: process.env.GOOGLE_API_KEY,
-  maxRetries: 1, 
+  maxRetries: 0, // Was 1 — exponential backoff was eating 10-20s per node
 });
 
-// Custom LLM Router with built-in fallbacks
+const groq8b = process.env.GROQ_API_KEY
+  ? new ChatGroq({ apiKey: process.env.GROQ_API_KEY, model: "llama-3.1-8b-instant", temperature: 0.2, maxRetries: 0 })
+  : null;
+
+// Standard router: Gemini 2.5 → Gemini 1.5 → Groq 8b (fast, high TPM)
 export const llm = {
   invoke: async (prompt) => {
-    try {
-      return await primaryLlm.invoke(prompt);
-    } catch (error1) {
-      console.log("[FinSight Fallback] 2.5-flash failed (likely rate limit). Switching to 1.5-flash...");
-      try {
-        return await fallbackLlm.invoke(prompt);
-      } catch (error2) {
-        console.log("[FinSight Fallback] 1.5-flash failed. Switching to Groq Llama-3...");
-        if (process.env.GROQ_API_KEY) {
-          // Delay to manage API rate limits (kept short to fit Vercel 60s limit)
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          const ultimateLlm = new ChatGroq({
-            apiKey: process.env.GROQ_API_KEY,
-            model: "llama-3.1-8b-instant", // 20,000 TPM — 3x more headroom than 70B (6K TPM)
-            temperature: 0.2,
-            maxRetries: 2,
-          });
-          return await ultimateLlm.invoke(prompt);
-        }
-        throw error2;
-      }
-    }
+    try { return await gemini25.invoke(prompt); } catch (_) {}
+    try { return await gemini15.invoke(prompt); } catch (_) {}
+    if (groq8b) return await groq8b.invoke(prompt);
+    throw new Error("All LLM providers failed.");
   }
 };

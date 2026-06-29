@@ -223,9 +223,21 @@ export async function catalystsNode(state) {
 }
 
 // Dedicated fast LLM for critical JSON nodes (synthesis + committee)
-const criticalLlm = process.env.GROQ_API_KEY
-  ? new ChatGroq({ apiKey: process.env.GROQ_API_KEY, model: "llama-3.3-70b-versatile", temperature: 0.1, maxRetries: 2 })
-  : llm;
+const criticalLlm = {
+  invoke: async (prompt) => {
+    if (process.env.GROQ_API_KEY) {
+      try {
+        const g70b = new ChatGroq({ apiKey: process.env.GROQ_API_KEY, model: "llama-3.3-70b-versatile", temperature: 0.1, maxRetries: 0 });
+        return await g70b.invoke(prompt);
+      } catch (_) {}
+      try {
+        const g8b = new ChatGroq({ apiKey: process.env.GROQ_API_KEY, model: "llama-3.1-8b-instant", temperature: 0.1, maxRetries: 0 });
+        return await g8b.invoke(prompt);
+      } catch (_) {}
+    }
+    return await llm.invoke(prompt);
+  }
+};
 
 export async function synthesisNode(state) {
   try {
