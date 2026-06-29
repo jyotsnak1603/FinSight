@@ -1,6 +1,6 @@
 # FinSight AI: Autonomous Investment Research Agent
 
-🚀 **Live Deployment:** [https://fin-sight-o5ztvbw44-jyotsnak1603s-projects.vercel.app/](https://fin-sight-o5ztvbw44-jyotsnak1603s-projects.vercel.app/)
+🚀 **Live Deployment:** [https://fin-sight-beta-pied.vercel.app/](https://fin-sight-beta-pied.vercel.app/)
 
 ## Overview — What it does
 FinSight AI is a production-grade autonomous agent that acts as a senior financial analyst. It takes a company name as input, orchestrates a multi-agent workflow to conduct deep research (fetching hard financial metrics and scraping real-time news), synthesizes the findings, and delivers a final institutional-grade verdict: **INVEST**, **WATCHLIST**, or **PASS**, along with a detailed Devil's Advocate committee review.
