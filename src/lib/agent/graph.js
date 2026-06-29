@@ -68,7 +68,7 @@ const workflow = new StateGraph(AgentState)
   .addNode("synthesis_node", synthesisNode)
   .addNode("committee_node", committeeNode)
 
-  // --- Sequential Research (To avoid massive Token/Minute Rate Limits) ---
+  // --- Sequential Research ---
   .addEdge(START, "business_node")
   .addEdge("business_node", "financials_node")
   .addEdge("financials_node", "competition_node")
