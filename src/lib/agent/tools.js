@@ -13,10 +13,15 @@ const client = tavily({
 
 export async function searchWeb(query) {
   const result = await client.search(query, {
-    maxResults: 5,
+    maxResults: 3,
   });
 
-  return result.results;
+  // Truncate content per result to keep token usage low
+  return result.results.map(r => ({
+    url: r.url,
+    title: r.title,
+    content: (r.content || "").slice(0, 400),
+  }));
 }
 
 if (!process.env.ALPHA_VANTAGE_API_KEY) {
