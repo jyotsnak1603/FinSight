@@ -36,8 +36,8 @@ export const llm = {
       } catch (error2) {
         console.log("[FinSight Fallback] 1.5-flash failed. Switching to Groq Llama-3...");
         if (process.env.GROQ_API_KEY) {
-          // Delay to manage API rate limits
-          await new Promise(resolve => setTimeout(resolve, 8000));
+          // Delay to manage API rate limits (kept short to fit Vercel 60s limit)
+          await new Promise(resolve => setTimeout(resolve, 2000));
           
           const ultimateLlm = new ChatGroq({
             apiKey: process.env.GROQ_API_KEY,

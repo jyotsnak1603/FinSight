@@ -1,6 +1,8 @@
 import { researchGraph } from "@/lib/agent/graph";
 import { headers } from "next/headers";
 
+export const maxDuration = 60; // Extend Vercel Hobby Tier timeout to maximum allowed (60 seconds)
+
 // ---------------------------------------------------------------------------
 // In-memory LRU cache (max 50 reports, keyed by normalized company name)
 // ---------------------------------------------------------------------------
