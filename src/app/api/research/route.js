@@ -4,46 +4,9 @@ import { headers } from "next/headers";
 export const maxDuration = 60; // Extend Vercel Hobby Tier timeout to maximum allowed (60 seconds)
 
 // ---------------------------------------------------------------------------
-// In-memory LRU cache (max 50 reports, keyed by normalized company name)
+// Note: In-memory cache and rate limiters were removed because they do not
+// persist across Vercel Serverless function invocations. Use Vercel KV in prod.
 // ---------------------------------------------------------------------------
-const MAX_CACHE_SIZE = 50;
-const reportCache = new Map();
-
-function cacheGet(key) {
-  if (!reportCache.has(key)) return null;
-  // Move to end (most-recently-used)
-  const value = reportCache.get(key);
-  reportCache.delete(key);
-  reportCache.set(key, value);
-  return value;
-}
-
-function cacheSet(key, value) {
-  if (reportCache.size >= MAX_CACHE_SIZE) {
-    // Evict oldest entry
-    reportCache.delete(reportCache.keys().next().value);
-  }
-  reportCache.set(key, value);
-}
-
-// ---------------------------------------------------------------------------
-// Rate limiter — 5 requests per 10 minutes per IP
-// ---------------------------------------------------------------------------
-const RATE_LIMIT_MAX = 5;
-const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
-const rateLimitMap = new Map();
-
-function isRateLimited(ip) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return false;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return true;
-  entry.count++;
-  return false;
-}
 
 // ---------------------------------------------------------------------------
 // Node display names for progress events
@@ -85,21 +48,8 @@ export async function POST(req) {
     return Response.json({ error: "Invalid company name." }, { status: 400 });
   }
 
-  // --- Rate limiting ---
-  const headersList = await headers();
-  const ip =
-    headersList.get("x-forwarded-for")?.split(",")[0].trim() ||
-    headersList.get("x-real-ip") ||
-    "unknown";
-
-  if (isRateLimited(ip)) {
-    return Response.json(
-      { error: "Too many requests. Please wait before trying again." },
-      { status: 429 }
-    );
-  }
-
-  const cacheKey = company.toLowerCase();
+  // --- Rate limiting removed for serverless compatibility ---
+  // In a production Vercel app, use @vercel/kv or Upstash Redis here.
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -111,14 +61,7 @@ export async function POST(req) {
       };
 
       try {
-        // --- Cache hit: emit complete immediately ---
-        const cached = cacheGet(cacheKey);
-        if (cached) {
-          emit({ event: "complete", data: cached, cached: true });
-          controller.close();
-          return;
-        }
-
+        // --- Cache hit logic removed for serverless compatibility ---
         // --- Run the graph with streaming ---
         const graphStream = await researchGraph.stream(
           {
@@ -175,8 +118,7 @@ export async function POST(req) {
           }
         }
 
-        // --- Cache and emit final result ---
-        cacheSet(cacheKey, finalData);
+        // --- Emit final result ---
         emit({ event: "complete", data: finalData, cached: false });
         controller.close();
       } catch (error) {

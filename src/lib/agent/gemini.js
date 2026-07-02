@@ -30,9 +30,12 @@ const groq8b = process.env.GROQ_API_KEY
 // Standard router: Gemini 2.5 → Gemini 1.5 → Groq 8b (fast, high TPM)
 export const llm = {
   invoke: async (prompt) => {
-    try { return await gemini25.invoke(prompt); } catch (_) {}
-    try { return await gemini15.invoke(prompt); } catch (_) {}
-    if (groq8b) return await groq8b.invoke(prompt);
-    throw new Error("All LLM providers failed.");
+    let lastError;
+    try { return await gemini25.invoke(prompt); } catch (e) { lastError = e; console.warn("[LLM] Gemini 2.5 failed:", e.message); }
+    try { return await gemini15.invoke(prompt); } catch (e) { lastError = e; console.warn("[LLM] Gemini 1.5 failed:", e.message); }
+    if (groq8b) {
+      try { return await groq8b.invoke(prompt); } catch (e) { lastError = e; console.warn("[LLM] Groq failed:", e.message); }
+    }
+    throw new Error(`All LLM providers failed. Last error: ${lastError?.message}`);
   }
 };

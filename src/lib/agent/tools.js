@@ -16,11 +16,11 @@ export async function searchWeb(query) {
     maxResults: 2,
   });
 
-  // Keep content tight to stay within Groq's 20K TPM limit
+  // Keep content tight to stay within Groq's 20K TPM limit but provide enough for actual analysis
   return result.results.map(r => ({
     url: r.url,
     title: r.title,
-    content: (r.content || "").slice(0, 200),
+    content: (r.content || "").slice(0, 3000),
   }));
 }
 

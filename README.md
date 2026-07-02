@@ -50,7 +50,8 @@ To guarantee 100% uptime, the `gemini.js` orchestrator utilizes a custom fallbac
 ## Key Decisions & Trade-offs
 1. **LangGraph vs. standard LangChain:** I chose LangGraph for precise state management and node separation rather than a standard ReAct agent, as financial verdicts require highly structured, deterministic steps rather than open-ended agentic loops.
 2. **Sequential vs. Parallel Execution:** While LangGraph excels at parallel node execution, I explicitly forced sequential edges. *Trade-off:* The report takes slightly longer to generate (60 seconds), but this ensures the application remains highly stable and crash-free on free-tier LLM API rate limits (12k TPM).
-3. **Alpha Vantage vs. Web Scraping:** Financial numbers scraped from web articles are often hallucinated or outdated. I traded slightly higher API complexity to strictly fetch JSON metrics via Alpha Vantage, guaranteeing that P/E ratios and Market Caps are mathematically accurate.
+3. **Alpha Vantage vs. Web Scraping:** Financial numbers scraped from web articles are often hallucinated or outdated. I traded slightly higher API complexity to strictly fetch JSON metrics via Alpha Vantage, guaranteeing that P/E ratios and Market Caps are mathematically accurate. (Note: The agent uses a fast LLM call to resolve raw company names into valid ticker symbols automatically).
+4. **Serverless State Management:** I chose to omit in-memory caching and rate-limiting from the Next.js API route. Because Vercel utilizes stateless Serverless functions, in-memory Maps do not persist reliably across requests or regions. For production rate-limiting, I would integrate Vercel KV or Upstash Redis.
 
 ## Example Runs
 

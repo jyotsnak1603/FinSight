@@ -68,18 +68,12 @@ const workflow = new StateGraph(AgentState)
   .addNode("synthesis_node", synthesisNode)
   .addNode("committee_node", committeeNode)
 
-  // --- Phase 1: Parallel Research (independent web searches) ---
+  // --- Phase 1: Sequential Research (avoid rate limits) ---
   .addEdge(START, "business_node")
-  .addEdge(START, "financials_node")
-  .addEdge(START, "competition_node")
-  .addEdge(START, "team_news_node")
-  .addEdge(START, "risks_node")
-
-  // All research nodes converge into gather_research
-  .addEdge("business_node", "gather_research")
-  .addEdge("financials_node", "gather_research")
-  .addEdge("competition_node", "gather_research")
-  .addEdge("team_news_node", "gather_research")
+  .addEdge("business_node", "financials_node")
+  .addEdge("financials_node", "competition_node")
+  .addEdge("competition_node", "team_news_node")
+  .addEdge("team_news_node", "risks_node")
   .addEdge("risks_node", "gather_research")
 
   // --- Phase 2: Sequential Analysis (each depends on prior output) ---

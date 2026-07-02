@@ -57,6 +57,17 @@ async function runResearch(company, category, query) {
   }
 }
 
+async function getTicker(company) {
+  try {
+    const response = await llm.invoke(`Given the company name "${company}", output ONLY its stock ticker symbol (e.g., AAPL for Apple, NVDA for NVIDIA). If it is a private company or you don't know, output NONE. Do not output any other text.`);
+    const ticker = response.content.trim().toUpperCase();
+    return ticker === "NONE" ? null : ticker;
+  } catch (error) {
+    console.error("Failed to get ticker:", error.message);
+    return null;
+  }
+}
+
 // No-op sync point: waits for all parallel research nodes to finish
 export async function gatherResearchNode(state) {
   return {};
@@ -76,7 +87,8 @@ export async function businessModelNode(state) {
 
 export async function financialsNode(state) {
   try {
-    const metrics = await getFinancialMetrics(state.company);
+    const ticker = await getTicker(state.company);
+    const metrics = ticker ? await getFinancialMetrics(ticker) : null;
     let searchResults = [];
     
     if (metrics) {
@@ -239,37 +251,7 @@ const criticalLlm = {
   }
 };
 
-// Rule-based fallback: computes a real verdict from existing node data
-function ruleBasedSynthesis(state) {
-  const moat = state.moatAnalysis || {};
-  const moatScore   = moat.overallMoat?.score || 6.5;
-  const brandScore  = moat.brand?.score || 6;
-  const techScore   = moat.technology?.score || 6;
-  const bullPoints  = state.bullCase?.points?.length || 0;
-  const bearPoints  = state.bearCase?.points?.length || 0;
-
-  const marketOpp   = Math.min(10, Math.max(4, Math.round(moatScore * 1.1)));
-  const compMoat    = Math.round(moatScore);
-  const finHealth   = Math.min(10, Math.max(4, Math.round((brandScore + techScore) / 2)));
-  const teamExec    = Math.min(9, Math.max(5, Math.round(moatScore)));
-  const riskProfile = Math.min(9, Math.max(3, 10 - bearPoints));
-  const avg         = (marketOpp + compMoat + finHealth + teamExec + riskProfile) / 5;
-  const verdict     = avg >= 7.5 ? "INVEST" : avg >= 6.0 ? "WATCHLIST" : "PASS";
-  const confidence  = Math.min(82, Math.max(58, Math.round(50 + avg * 4)));
-
-  return {
-    scores: {
-      marketOpportunity: { score: marketOpp, reason: moat.overallMoat?.reason || "Derived from competitive moat analysis." },
-      competitiveMoat:   { score: compMoat,  reason: moat.overallMoat?.reason || "Strong market position identified." },
-      financialHealth:   { score: finHealth,  reason: "Based on available brand and technology indicators." },
-      teamExecution:     { score: teamExec,   reason: "Leadership assessment based on moat analysis." },
-      riskProfile:       { score: riskProfile, reason: `${bearPoints} risk factor(s) identified in bear case analysis.` },
-    },
-    verdict,
-    confidence,
-    summary: `Analysis across ${bullPoints} bull-case strengths and ${bearPoints} bear-case risks. Overall moat: ${moatScore}/10.`,
-  };
-}
+// Removed fake ruleBasedSynthesis
 
 export async function synthesisNode(state) {
   const allSources = [
@@ -285,7 +267,7 @@ export async function synthesisNode(state) {
     const response = await criticalLlm.invoke(synthesisPrompt(state));
     const result = await parseJsonResponse(response);
     if (!result.confidence || result.confidence === 0) {
-      result.confidence = ruleBasedSynthesis(state).confidence;
+      result.confidence = 65; // Provide a default if LLM misses it, instead of fake logic
     }
     return {
       scores: result.scores,
@@ -296,16 +278,8 @@ export async function synthesisNode(state) {
       steps: ["Investment Decision Completed"],
     };
   } catch (error) {
-    console.error("Synthesis LLM failed, using rule-based fallback:", error.message);
-    const fallback = ruleBasedSynthesis(state);
-    return {
-      scores: fallback.scores,
-      verdict: fallback.verdict,
-      confidence: fallback.confidence,
-      finalSummary: fallback.summary,
-      sources: uniqueSources,
-      steps: ["Investment Decision Completed (Rule-Based)"],
-    };
+    console.error("Synthesis LLM failed:", error.message);
+    throw new Error("Synthesis LLM failed to generate a valid verdict. Please try again.");
   }
 }
 
@@ -315,18 +289,7 @@ export async function committeeNode(state) {
     const result = await parseJsonResponse(response);
     return { committeeDecision: result, steps: ["Investment Committee Completed"] };
   } catch (error) {
-    console.error("Committee LLM failed, using data-driven fallback:", error.message);
-    const bullPoints = state.bullCase?.points?.length || 0;
-    const bearPoints = state.bearCase?.points?.length || 0;
-    const moatScore  = state.moatAnalysis?.overallMoat?.score || 6.5;
-    return {
-      committeeDecision: {
-        committeeVerdict: state.verdict,
-        committeeReasoning: `Committee assessment: ${bullPoints} bull-case arguments vs ${bearPoints} bear-case risks. Overall moat: ${moatScore}/10. The synthesis verdict of ${state.verdict} (${state.confidence}% confidence) is supported by the available evidence.`,
-        overrideSynthesis: false,
-        overrideReason: "",
-      },
-      steps: ["Investment Committee Completed (Data-Driven)"],
-    };
+    console.error("Committee LLM failed:", error.message);
+    throw new Error("Committee LLM failed to generate a valid review. Please try again.");
   }
 }
