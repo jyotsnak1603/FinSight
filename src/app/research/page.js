@@ -5,6 +5,7 @@ import SearchBar from "@/components/SearchBar";
 import ResearchFeed from "@/components/ResearchFeed";
 import Scorecard from "@/components/Scorecard";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import Hero3D from "@/components/Hero3D";
 
 // ─── Status machine states ────────────────────────────────────────────────────
 // idle → loading → complete
@@ -96,8 +97,12 @@ export default function Home() {
         backgroundColor: "var(--bg-base)",
         display: "flex",
         flexDirection: "column",
+        position: "relative",
       }}
     >
+      {/* ── 3D Background ── */}
+      <Hero3D />
+
       {/* ── Ambient background glow ── */}
       <div
         aria-hidden="true"
